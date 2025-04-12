@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Parent, Calon_mahasiswa
+from rest_framework.validators import UniqueValidator
 
 class ParentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,7 +37,7 @@ class Calon_mahasiswaListSerializer(serializers.ModelSerializer):
     code = serializers.CharField(max_length=10)
     first_name = serializers.CharField(max_length=50)
     last_name = serializers.CharField(max_length=50, allow_blank=True, required=False)
-    email = serializers.EmailField()
+    email = serializers.EmailField(validators=[UniqueValidator(queryset=Calon_mahasiswa.objects.all())])
     phone = serializers.CharField(max_length=15)
     address = serializers.CharField()
 

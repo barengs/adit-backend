@@ -121,7 +121,7 @@ class StudyProgramSerializer(serializers.ModelSerializer):
         model = StudyProgram
         fields = '__all__'
 
-class StudyProgramListSerializer(serializers.ModelSerializer):
+class StudyProgramListSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=100)
     code = serializers.CharField(max_length=10)
@@ -132,7 +132,7 @@ class RegistrationPeriodSerializer(serializers.ModelSerializer):
         model = RegistrationPeriod
         fields = '__all__'
 
-class RegistrationPeriodListSerializer(serializers.ModelSerializer):
+class RegistrationPeriodListSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     period = serializers.CharField(max_length=9)
 
@@ -141,12 +141,13 @@ class SchoolSerializer(serializers.ModelSerializer):
         model = School
         fields = '__all__'
 
-class SchoolListSerializer(serializers.ModelSerializer):
+class SchoolListSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=100)
     code = serializers.CharField(max_length=10)
     address = serializers.CharField(max_length=255)
     phone = serializers.CharField(max_length=15)
+
 
 class JobSerializer(serializers.ModelSerializer):
     class Meta:
