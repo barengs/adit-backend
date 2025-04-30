@@ -33,7 +33,7 @@ class Citizen(models.Model):
 
 class Province(models.Model):
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10)
     meta = models.JSONField(default=dict)
 
     class Meta:
@@ -44,7 +44,7 @@ class Province(models.Model):
 
 class Regency(models.Model):
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10)
     province = models.ForeignKey(Province, on_delete=models.CASCADE)
     meta = models.JSONField(default=dict)
 
@@ -56,7 +56,7 @@ class Regency(models.Model):
 
 class Subdistrict(models.Model):
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10)
     regency = models.ForeignKey(Regency, on_delete=models.CASCADE)
     meta = models.JSONField(default=dict)
 
@@ -68,7 +68,7 @@ class Subdistrict(models.Model):
 
 class Village(models.Model):
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10)
     subdistrict = models.ForeignKey(Subdistrict, on_delete=models.CASCADE)
     meta = models.JSONField(default=dict)
 
@@ -120,7 +120,7 @@ class RegistrationPeriod(models.Model):
 
 class School(models.Model):
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=10)
+    code = models.CharField(max_length=50, unique=True)
     address = models.TextField()
     phone = models.CharField(max_length=15, unique=True)
 

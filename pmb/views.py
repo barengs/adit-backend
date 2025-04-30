@@ -3,7 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Parent, Calon_mahasiswa
-from .serializers import ParentSerializer, ParentListSerializer, Calon_mahasiswaSerializer, Calon_mahasiswaListSerializer
+from .serializers import (ParentSerializer, ParentListSerializer, Calon_mahasiswaSerializer,
+                         Calon_mahasiswaListSerializer, Calon_mahasiswaBulkInsertSerializer)
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -171,3 +172,65 @@ class CalonMahasiswaDetail(APIView):
         calon = self.get_object(pk)
         calon.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CalonMahasiswaBulkInsertAPIView(APIView):
+    @swagger_auto_schema(
+        operation_description="Bulk insert calon mahasiswa",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['calon_mahasiswa'],
+            properties={
+                'calon_mahasiswa': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'code': openapi.Schema(type=openapi.TYPE_STRING),
+                            'first_name': openapi.Schema(type=openapi.TYPE_STRING),
+                            'last_name': openapi.Schema(type=openapi.TYPE_STRING),
+                            'email': openapi.Schema(type=openapi.TYPE_STRING),
+                            'phone': openapi.Schema(type=openapi.TYPE_STRING),
+                            'address': openapi.Schema(type=openapi.TYPE_STRING),
+                            'gender': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'religion': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'citizen': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'province': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'regency': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'subdistrict': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'village': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'registrationpath': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'faculty': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'studyprogram': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'registrationperiod': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'school': openapi.Schema(type=openapi.TYPE_INTEGER),
+                            'parent': openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    'nik': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'first_name': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'last_name': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'kk': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'address': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'contact': openapi.Schema(type=openapi.TYPE_STRING),
+                                    'job': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    'income': openapi.Schema(type=openapi.TYPE_INTEGER),
+                                }
+                            )
+                        }
+                    )
+                )
+            }
+        ),
+        responses={201: "Created", 400: "Validation Error"},
+        tags=["CalonMahasiswa"]
+    )
+    def post(self, request, format=None):
+        serializer = Calon_mahasiswaBulkInsertSerializer(data=request.data)
+        if serializer.is_valid():
+            inserted = serializer.save()
+            return Response({
+                "status": "success",
+                "inserted_count": len(inserted)
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Religion, Gender, Citizen, Province, Regency, Subdistrict, Village, RegistrationPath, Faculty, StudyProgram, RegistrationPeriod, School, Job, Income
+from rest_framework.validators import UniqueValidator
+
 
 class ReligionSerializer(serializers.ModelSerializer):
     # id = serializers.IntegerField(read_only=True)
@@ -141,12 +143,18 @@ class SchoolSerializer(serializers.ModelSerializer):
         model = School
         fields = '__all__'
 
-class SchoolListSerializer(serializers.Serializer):
+class SchoolListSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=100)
-    code = serializers.CharField(max_length=10)
+    code = serializers.CharField(max_length=50, 
+                                 validators = [UniqueValidator(queryset=School.objects.all())])
     address = serializers.CharField(max_length=255)
-    phone = serializers.CharField(max_length=15)
+    phone = serializers.CharField(max_length=15, 
+                                  validators = [UniqueValidator(queryset=School.objects.all())])
+
+    class Meta:
+        model = School
+        fields = ['id, name, code, address, phone']
 
 
 class JobSerializer(serializers.ModelSerializer):

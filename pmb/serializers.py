@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueValidator
 class ParentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parent
-        fields = '__all__'
+        fields = ['nik', 'first_name', 'last_name']
 
 class ParentListSerializer(serializers.ModelSerializer):
 
@@ -27,18 +27,28 @@ class ParentListSerializer(serializers.ModelSerializer):
         ]
 
 class Calon_mahasiswaSerializer(serializers.ModelSerializer):
+    parent = ParentSerializer()
+
+    parent = serializers.SlugRelatedField(
+        slug_field='nik',
+        queryset=Parent.objects.all()
+    )
+
     class Meta:
         model = Calon_mahasiswa
         fields = '__all__'
 
+
 class Calon_mahasiswaListSerializer(serializers.ModelSerializer):
 
     id = serializers.IntegerField(read_only=True)
-    code = serializers.CharField(max_length=10)
+    code = serializers.CharField(max_length=10,
+                                 validators = [UniqueValidator(queryset=Calon_mahasiswa.objects.all())])
     first_name = serializers.CharField(max_length=50)
     last_name = serializers.CharField(max_length=50, allow_blank=True, required=False)
     email = serializers.EmailField(validators=[UniqueValidator(queryset=Calon_mahasiswa.objects.all())])
-    phone = serializers.CharField(max_length=15)
+    phone = serializers.CharField(max_length=15,
+                                  validators = [UniqueValidator(queryset=Calon_mahasiswa.objects.all())])
     address = serializers.CharField()
 
     gender = serializers.CharField(source='gender.__str__', read_only=True)
@@ -66,3 +76,14 @@ class Calon_mahasiswaListSerializer(serializers.ModelSerializer):
             'registrationpath', 'faculty', 'studyprogram', 'registrationperiod',
             'school', 'parent'
         ]
+
+class Calon_mahasiswaBulkInsertSerializer(serializers.Serializer):
+    calon_mahasiswa = Calon_mahasiswaSerializer(many=True)
+
+    def create(self, validated_data):
+        results = []
+        for item in validated_data['calon_mahasiswa']:
+            serializer = Calon_mahasiswaSerializer(data=item)
+            serializer.is_valid(raise_exception=True)
+            results.append(serializer.save())
+        return results

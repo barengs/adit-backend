@@ -4,13 +4,12 @@ from masters.models import (Religion, Gender, Citizen, Province, Regency, Subdis
 class Parent(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50, blank=True, null=True)
-    nik = models.CharField(max_length=16, unique=True)
+    nik = models.CharField(max_length=16, unique=True, primary_key=True)
     kk = models.CharField(max_length=16, unique=True)
     address = models.TextField()
-    contact = models.CharField(max_length=15)
-    # education = models.ForeignKey(Education, on_delete=models.PROTECT)
-    job = models.ForeignKey(Job, on_delete=models.PROTECT)
-    income = models.ForeignKey(Income, on_delete=models.PROTECT)
+    contact = models.CharField(max_length=15, unique=True)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    income = models.ForeignKey(Income, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['first_name']
@@ -37,7 +36,7 @@ class Calon_mahasiswa(models.Model):
     studyprogram = models.ForeignKey(StudyProgram, on_delete=models.CASCADE)
     registrationperiod = models.ForeignKey(RegistrationPeriod, on_delete=models.CASCADE)
     school = models.ForeignKey(School, on_delete=models.CASCADE)
-    parent = models.ForeignKey(Parent, on_delete=models.CASCADE)
+    parent = models.ForeignKey(Parent, on_delete=models.CASCADE, to_field='nik')
 
     class Meta:
         ordering = ['code']
