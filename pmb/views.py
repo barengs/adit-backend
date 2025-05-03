@@ -2,9 +2,9 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Parent, Calon_mahasiswa
+from .models import Parent, Calon_mahasiswa, BuktiBayar, BuktiIdentitas
 from .serializers import (ParentSerializer, ParentListSerializer, Calon_mahasiswaSerializer,
-                         Calon_mahasiswaListSerializer, Calon_mahasiswaBulkInsertSerializer)
+                         Calon_mahasiswaListSerializer, Calon_mahasiswaBulkInsertSerializer, BuktiBayarSerializer, BuktiIdentitasSerializer, BuktiBayarListSerializer, BuktiIdentitasListSerializer)
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -234,3 +234,122 @@ class CalonMahasiswaBulkInsertAPIView(APIView):
                 "inserted_count": len(inserted)
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class BuktiBayarList(APIView):
+
+    @swagger_auto_schema(
+        responses={200: BuktiBayarSerializer(many=True)},
+        tags=['BuktiBayar']
+    )
+    def get(self, request, format=None):
+        buktibayar = BuktiBayar.objects.all()
+        serializer = BuktiBayarListSerializer(buktibayar, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        operation_description="Upload bukti bayar",
+        request_body=BuktiBayarSerializer,
+        responses={201: BuktiBayarSerializer()},
+        tags=['BuktiBayar']
+    )
+    def post(self, request, format=None):
+        serializer = BuktiBayarSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class BuktiBayarDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return BuktiBayar.objects.get(pk=pk)
+        except BuktiBayar.DoesNotExist:
+            raise Http404
+
+    @swagger_auto_schema(
+        responses={200: BuktiBayarListSerializer()},
+        tags=['BuktiBayar']
+    )
+    def get(self, request, pk, format=None):
+        buktibayar = self.get_object(pk)
+        serializer = BuktiBayarListSerializer(buktibayar)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        request_body=BuktiBayarSerializer,
+        responses={200: BuktiBayarSerializer()},
+        tags=['BuktiBayar']
+    )
+    def put(self, request, pk, format=None):
+        buktibayar = self.get_object(pk)
+        serializer = BuktiBayarSerializer(buktibayar, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        buktibayar = self.get_object(pk)
+        buktibayar.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class BuktiIdentitasList(APIView):
+
+    @swagger_auto_schema(
+        responses={200: BuktiIdentitasListSerializer(many=True)},
+        tags=['BuktiIdentitas']
+    )
+    def get(self, request, format=None):
+        buktiidentitas = BuktiIdentitas.objects.all()
+        serializer = BuktiIdentitasSerializer(buktiidentitas, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        operation_description="Upload bukti identitas",
+        request_body=BuktiIdentitasSerializer,
+        responses={201: BuktiIdentitasSerializer()},
+        tags=['BuktiIdentitas']
+    )
+    def post(self, request, format=None):
+        serializer = BuktiIdentitasSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class BuktiIdentitasDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return BuktiIdentitas.objects.get(pk=pk)
+        except BuktiIdentitas.DoesNotExist:
+            raise Http404
+
+    @swagger_auto_schema(
+        responses={200: BuktiIdentitasSerializer()},
+        tags=['BuktiIdentitas']
+    )
+    def get(self, request, pk, format=None):
+        obj = self.get_object(pk)
+        serializer = BuktiIdentitasSerializer(obj)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        request_body=BuktiIdentitasSerializer,
+        responses={200: BuktiIdentitasSerializer()},
+        tags=['BuktiIdentitas']
+    )
+    def put(self, request, pk, format=None):
+        obj = self.get_object(pk)
+        serializer = BuktiIdentitasSerializer(obj, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        obj = self.get_object(pk)
+        obj.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

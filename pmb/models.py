@@ -43,3 +43,25 @@ class Calon_mahasiswa(models.Model):
         
     def __str__(self):
         return f"{self.code} - {self.first_name} {self.last_name or ''}"
+    
+class BuktiBayar(models.Model):
+    calon_mahasiswa = models.ForeignKey(Calon_mahasiswa, on_delete=models.CASCADE, related_name='bukti_bayar')
+    file = models.FileField(upload_to='bukti_bayar/')
+    tanggal_upload = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['tanggal_upload']
+
+    def __str__(self):
+        return f"Bukti Bayar - {self.calon_mahasiswa.code}"
+    
+class BuktiIdentitas(models.Model):
+    calon_mahasiswa = models.ForeignKey(Calon_mahasiswa, on_delete=models.CASCADE, related_name='bukti_identitas')
+    file = models.FileField(upload_to='bukti_identitas/')
+    tanggal_upload = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['tanggal_upload']
+
+    def __str__(self):
+        return f"Bukti Identitas - {self.calon_mahasiswa.code}"
