@@ -2,9 +2,9 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Parent, Calon_mahasiswa, BuktiBayar, BuktiIdentitas
+from .models import Parent, Calon_mahasiswa, BuktiBayar, BuktiIdentitas, Registration_wave
 from .serializers import (ParentSerializer, ParentListSerializer, Calon_mahasiswaSerializer,
-                         Calon_mahasiswaListSerializer, Calon_mahasiswaBulkInsertSerializer, BuktiBayarSerializer, BuktiIdentitasSerializer, BuktiBayarListSerializer, BuktiIdentitasListSerializer)
+                         Calon_mahasiswaListSerializer, Calon_mahasiswaBulkInsertSerializer, BuktiBayarSerializer, BuktiIdentitasSerializer, BuktiBayarListSerializer, BuktiIdentitasListSerializer, Registration_waveSerializer, Registration_waveListSerializers)
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -352,4 +352,71 @@ class BuktiIdentitasDetail(APIView):
     def delete(self, request, pk, format=None):
         buktiidentitas = self.get_object(pk)
         buktiidentitas.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class RegistrationWaveList(APIView):
+
+    @swagger_auto_schema(
+        query_serializer=Registration_waveListSerializers,
+        responses={200: Registration_waveSerializer(many=True)},
+        tags=['Registration Wave'],
+    )
+    def get(self, request, format=None):
+        waves = Registration_wave.objects.all()
+        serializer = Registration_waveSerializer(waves, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        operation_description="Create a new registration wave",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['name', 'status'],
+            properties={
+                'name': openapi.Schema(type=openapi.TYPE_STRING),
+                'status': openapi.Schema(type=openapi.TYPE_STRING)
+            },
+        ),
+        tags=['Registration Wave'],
+    )
+    def post(self, request, format=None):
+        serializer = Registration_waveSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RegistrationWaveDetail(APIView):
+
+    def get_object(self, pk):
+        try:
+            return Registration_wave.objects.get(pk=pk)
+        except Registration_wave.DoesNotExist:
+            raise Http404
+
+    @swagger_auto_schema(
+        responses={200: Registration_waveSerializer},
+        tags=['Registration Wave'],
+    )
+    def get(self, request, pk, format=None):
+        wave = self.get_object(pk)
+        serializer = Registration_waveSerializer(wave)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        request_body=Registration_waveSerializer,
+        responses={200: Registration_waveSerializer},
+        tags=['Registration Wave']
+    )
+    def put(self, request, pk, format=None):
+        wave = self.get_object(pk)
+        serializer = Registration_waveSerializer(wave, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        wave = self.get_object(pk)
+        wave.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Parent, Calon_mahasiswa, BuktiBayar, BuktiIdentitas
+from .models import Parent, Calon_mahasiswa, BuktiBayar, BuktiIdentitas, Registration_wave
 from .models import Parent, Job, Income
 from rest_framework.validators import UniqueValidator
 
@@ -43,6 +43,16 @@ class ParentListSerializer(serializers.ModelSerializer):
             'address', 'contact', 'job', 'income'
         ]
 
+class Registration_waveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Registration_wave
+        fields = '__all__'
+
+class Registration_waveListSerializers(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=15)
+    status = serializers.CharField(max_length=10)
+
 class Calon_mahasiswaSerializer(serializers.ModelSerializer):
 
     parent = serializers.SlugRelatedField(
@@ -57,6 +67,7 @@ class Calon_mahasiswaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Calon_mahasiswa
         fields = '__all__'
+
 
 
 class Calon_mahasiswaListSerializer(serializers.ModelSerializer):

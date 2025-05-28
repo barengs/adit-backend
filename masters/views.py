@@ -149,13 +149,6 @@ class GenderDetail(APIView):
         gender = self.get_object(pk)
         gender.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def post(self, request, format=None):
-        serialzer = CitizenSerializer(data=request.data)
-        if serialzer.is_valid():
-            serialzer.save()
-            return Response(serialzer.data, status=status.HTTP_201_CREATED)
-        return Response(serialzer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class CitizenList(APIView):
 
