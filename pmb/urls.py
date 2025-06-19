@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (ParentList, ParentDetail, CalonMahasiswaList,
                     CalonMahasiswaDetail, CalonMahasiswaBulkInsertAPIView, BuktiBayarList, BuktiBayarDetail,
-                      BuktiIdentitasDetail, BuktiIdentitasList, RegistrationWaveList, RegistrationWaveDetail)
+                      BuktiIdentitasDetail, BuktiIdentitasList, RegistrationWaveList, RegistrationWaveDetail,
+                      PaymentList, PaymentDetail)
 
 urlpatterns = [
     path('parent/', ParentList.as_view(), name='parentlist'),
@@ -15,4 +16,6 @@ urlpatterns = [
     path('bukti-identitas/<int:pk>/', BuktiIdentitasDetail.as_view(), name='buktiidentitasdetail'),
     path('gelombang/', RegistrationWaveList.as_view(), name='gelombangmahasiswalist'),
     path('gelombang/<int:pk>/', RegistrationWaveDetail.as_view(), name='gelombangmahasiswadetail'),
+    path('pembayaran/', PaymentList.as_view(), name='pembayaranlist'),
+    path('pembayaran/<int:pk>/', PaymentDetail.as_view(), name='pembayarandetail'),
 ]

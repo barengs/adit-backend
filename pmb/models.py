@@ -75,3 +75,12 @@ class BuktiIdentitas(models.Model):
 
     def __str__(self):
         return f"Bukti Identitas - {self.calon_mahasiswa.code}"
+
+class Payment(models.Model):
+    calon_mahasiswa = models.ForeignKey(Calon_mahasiswa, on_delete=models.CASCADE, related_name='payment')
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    payment_number = models.CharField(max_length=100, unique=True)
+    payment_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+       return f"payment {self.payment_number} - {self.amount}" 

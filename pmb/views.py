@@ -2,9 +2,11 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Parent, Calon_mahasiswa, BuktiBayar, BuktiIdentitas, Registration_wave
+from .models import Parent, Calon_mahasiswa, BuktiBayar, BuktiIdentitas, Registration_wave, Payment
 from .serializers import (ParentSerializer, ParentListSerializer, Calon_mahasiswaSerializer,
-                         Calon_mahasiswaListSerializer, Calon_mahasiswaBulkInsertSerializer, BuktiBayarSerializer, BuktiIdentitasSerializer, BuktiBayarListSerializer, BuktiIdentitasListSerializer, Registration_waveSerializer, Registration_waveListSerializers)
+                         Calon_mahasiswaListSerializer, Calon_mahasiswaBulkInsertSerializer, BuktiBayarSerializer, 
+                         BuktiIdentitasSerializer, BuktiBayarListSerializer, BuktiIdentitasListSerializer, 
+                         Registration_waveSerializer, Registration_waveListSerializers, PaymentSerializer, PaymentListSerializer)
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -419,4 +421,76 @@ class RegistrationWaveDetail(APIView):
     def delete(self, request, pk, format=None):
         wave = self.get_object(pk)
         wave.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class PaymentList(APIView):
+    @swagger_auto_schema(
+        query_serializer=PaymentListSerializer,
+        responses={200: PaymentListSerializer (many = True)},
+        tags=['Payment'],
+    )
+    def get(self, request, format=None):
+        payments = Payment.objects.all()
+        serializer = PaymentListSerializer(payments, many=True)
+        return Response(serializer.data)
+    
+    @swagger_auto_schema(
+        operation_description="Create a new payment",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['calon_mahasiswa', 'amount', 'payment_number', 'payment_date'],
+            properties={
+                'calon_mahasiswa': openapi.Schema(type=openapi.TYPE_INTEGER),
+                'amount': openapi.Schema(type=openapi.TYPE_NUMBER, format='decimal'),
+                'payment_number': openapi.Schema(type=openapi.TYPE_STRING),
+                'payment_date': openapi.Schema(type=openapi.FORMAT_DATETIME, description='Format: YYYY-MM-DDTHH:MM:SSZ'),
+            },
+        ),
+        responses={201: PaymentSerializer},
+        tags=['Payment'],
+    )
+    def post(self, request, format=None):
+        serializer = PaymentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PaymentDetail(APIView):
+
+    def get_object(self, pk):
+        try:
+            return Payment.objects.get(pk=pk)
+        except Payment.DoesNotExist:
+            raise Http404
+
+    @swagger_auto_schema(
+        responses={200: PaymentListSerializer},
+        tags=['Payment'],
+    )
+    def get(self, request, pk, format=None):
+        payment = self.get_object(pk)
+        serializer = PaymentListSerializer(payment)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        request_body=PaymentSerializer,
+        responses={200: PaymentSerializer},
+        tags=['Payment'],
+    )
+    def put(self, request, pk, format=None):
+        payment = self.get_object(pk)
+        serializer = PaymentSerializer(payment, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        operation_description="Delete a payment by ID",
+        tags=['Payment'],
+    )
+    def delete(self, request, pk, format=None):
+        payment = self.get_object(pk)
+        payment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

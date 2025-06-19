@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Parent, Calon_mahasiswa, BuktiBayar, BuktiIdentitas, Registration_wave
+from .models import Parent, Calon_mahasiswa, BuktiBayar, BuktiIdentitas, Registration_wave, Payment
 from .models import Parent, Job, Income
 from rest_framework.validators import UniqueValidator
 
@@ -144,3 +144,15 @@ class BuktiIdentitasListSerializer(serializers.ModelSerializer):
     class Meta:
         model = BuktiIdentitas
         fields = ['id', 'calon_mahasiswa_code', 'file', 'tanggal_upload']
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = '__all__'
+
+class PaymentListSerializer(serializers.ModelSerializer):
+    calon_mahasiswa_nik = serializers.CharField(source='calon_mahasiswa.nik', read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = ['id', 'calon_mahasiswa', 'calon_mahasiswa_nik', 'amount', 'payment_number', 'payment_date']
